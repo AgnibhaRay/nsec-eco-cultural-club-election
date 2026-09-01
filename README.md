@@ -8,6 +8,7 @@ A transparent, three-candidate presidential election application for the Eco Cul
 ## Features
 
 - Exactly three ordered candidate slots, each with an editable name, manifesto line, and photo
+- EVM-inspired digital ballot unit with aligned candidate rows, blue vote buttons, and status lights
 - In-browser camera capture with a preview and retake flow
 - Duplicate-vote prevention using a normalized voter name
 - Private voter photos in Supabase Storage
@@ -25,7 +26,7 @@ There is deliberately no ballot-editing endpoint or hidden vote-manipulation bac
 1. Apply the database migrations and create an administrator.
 2. Keep voting paused while the administrator enters the three candidate profiles.
 3. Resume voting from the admin dashboard.
-4. Members enter their registered name, capture a photo, select a candidate, and submit once.
+4. Members enter their registered name, capture a photo, accept the consent notice, and press the blue button beside one candidate to submit once.
 5. Pause voting if an operational issue occurs; each state change is audited.
 6. Click **Declare final result** after verification. This permanently closes the election, locks candidate editing, and shows totals on the public page.
 

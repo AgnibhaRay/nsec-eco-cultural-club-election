@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, Send } from "lucide-react";
+import { Camera, CircleCheck, RotateCcw } from "lucide-react";
 import Image from "next/image";
 import type { Candidate } from "@/lib/types";
 
@@ -71,7 +71,7 @@ export default function VotingForm() {
     const highest = Math.max(0, ...candidates.map((candidate) => candidate.votes ?? 0));
     const winners = totalVotes > 0 ? candidates.filter((candidate) => (candidate.votes ?? 0) === highest) : [];
     return (
-      <section className="vote-card public-results-card">
+      <section className="result-device public-results-card">
         <div className="card-kicker">Official final result</div>
         <h2>{winners.length === 1 ? `${winners[0].name} is elected` : winners.length > 1 ? "The result is tied" : "Election concluded"}</h2>
         <p className="result-summary">{totalVotes} verified {totalVotes === 1 ? "vote" : "votes"} counted{publishedAt ? ` · Declared ${new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" }).format(new Date(publishedAt))}` : ""}</p>
@@ -134,18 +134,18 @@ export default function VotingForm() {
     void startCamera();
   }
 
-  async function submitVote(event: React.FormEvent) {
-    event.preventDefault();
+  async function submitVote(candidate: PublicCandidate) {
     setError("");
-    if (!name.trim() || !candidateId || !photo || !consent) {
-      setError("Complete your name, candidate choice, selfie, and consent before voting.");
+    if (!name.trim() || !photo || !consent) {
+      setError("Complete your registered name, verification photo, and consent before pressing a candidate button.");
       return;
     }
 
+    setCandidateId(candidate.id);
     setSubmitting(true);
     const form = new FormData();
     form.set("name", name.trim());
-    form.set("candidateId", candidateId);
+    form.set("candidateId", candidate.id);
     form.set("photo", photo, "selfie.jpg");
 
     try {
@@ -155,87 +155,133 @@ export default function VotingForm() {
       router.push("/success");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Your vote could not be recorded.");
+      setCandidateId("");
       setSubmitting(false);
     }
   }
 
   return (
-    <form className="vote-card" onSubmit={submitVote}>
-      <div className="card-kicker">Official ballot</div>
-      <h2>Cast your vote</h2>
-
-      <label className="field-label" htmlFor="voter-name">Your full name</label>
-      <input
-        className="text-input"
-        id="voter-name"
-        name="name"
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        placeholder="As registered with the club"
-        autoComplete="name"
-        maxLength={100}
-        disabled={!electionOpen || submitting}
-        required
-      />
-
-      <div className="section-space">
-        <div className="field-label">Choose one candidate</div>
-        <div className="candidate-list">
-          {candidates.map((candidate) => (
-            <label className="candidate-option" key={candidate.id}>
-              <input
-                type="radio"
-                name="candidate"
-                value={candidate.id}
-                checked={candidateId === candidate.id}
-                onChange={() => setCandidateId(candidate.id)}
-                disabled={!electionOpen || submitting}
-              />
-              <span className="candidate-label">
-                <span className="candidate-number candidate-profile-photo" style={{ background: candidate.accent }}>
-                  {candidate.photo_url ? <Image src={candidate.photo_url} alt="" fill sizes="41px" unoptimized /> : candidate.ballot_number}
-                </span>
-                <span>
-                  <span className="candidate-name">{candidate.name}</span>
-                  <span className="candidate-tag">{candidate.tagline}</span>
-                </span>
-                <span className="radio-dot" />
-              </span>
-            </label>
-          ))}
+    <form className="evm-voting-form" onSubmit={(event) => event.preventDefault()}>
+      <section className="evm-verification-panel" aria-labelledby="verification-heading">
+        <div className="verification-heading-row">
+          <div>
+            <span className="verification-step">Voter verification</span>
+            <h2 id="verification-heading">Identify yourself</h2>
+          </div>
+          <span className={`verification-status ${photo && name.trim() && consent ? "complete" : ""}`}>
+            <CircleCheck size={15} /> {photo && name.trim() && consent ? "Ready" : "Required"}
+          </span>
         </div>
-      </div>
 
-      <div className="section-space">
-        <div className="field-label">Voter verification photo</div>
-        <div className="camera-box">
-          {cameraState === "idle" && (
-            <div className="camera-idle">
-              <span className="camera-icon"><Camera size={18} /></span>
-              Your photo is kept private and visible only to authorised election admins.
+        <div className="verification-grid">
+          <div className="verification-name">
+            <label className="field-label" htmlFor="voter-name">Registered member name</label>
+            <input
+              className="text-input"
+              id="voter-name"
+              name="name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Enter your full name"
+              autoComplete="name"
+              maxLength={100}
+              disabled={!electionOpen || submitting}
+              required
+            />
+            <p>This must match the name in the club register.</p>
+          </div>
+
+          <div>
+            <div className="field-label">Verification photo</div>
+            <div className="camera-box evm-camera-box">
+              {cameraState === "idle" && (
+                <div className="camera-idle">
+                  <span className="camera-icon"><Camera size={18} /></span>
+                  Capture a clear photo
+                </div>
+              )}
+              {cameraState === "live" && <video ref={videoRef} autoPlay muted playsInline />}
+              {/* A temporary local camera Blob URL should not pass through the image optimizer. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {cameraState === "captured" && photoPreview && <img src={photoPreview} alt="Captured voter selfie" />}
+              <div className="camera-actions">
+                {cameraState === "idle" && <button className="mini-btn" type="button" onClick={startCamera} disabled={!electionOpen}>Open camera</button>}
+                {cameraState === "live" && <button className="mini-btn" type="button" onClick={capturePhoto}>Take photo</button>}
+                {cameraState === "captured" && <button className="mini-btn" type="button" onClick={retake}><RotateCcw size={12} /> Retake</button>}
+              </div>
             </div>
-          )}
-          {cameraState === "live" && <video ref={videoRef} autoPlay muted playsInline />}
-          {/* A temporary local camera Blob URL should not pass through the image optimizer. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          {cameraState === "captured" && photoPreview && <img src={photoPreview} alt="Captured voter selfie" />}
-          <div className="camera-actions">
-            {cameraState === "idle" && <button className="mini-btn" type="button" onClick={startCamera} disabled={!electionOpen}>Open camera</button>}
-            {cameraState === "live" && <button className="mini-btn" type="button" onClick={capturePhoto}>Take photo</button>}
-            {cameraState === "captured" && <button className="mini-btn" type="button" onClick={retake}>Retake</button>}
           </div>
         </div>
-      </div>
 
-      <label className="consent">
-        <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} disabled={!electionOpen} />
-        <span>I understand this is a non-secret ballot: authorised election admins can see my name, photo, and selected candidate for verification.</span>
-      </label>
+        <label className="consent evm-consent">
+          <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} disabled={!electionOpen} />
+          <span>I understand this is a non-secret ballot. Authorised election admins can see my name, photo, and selected candidate for verification.</span>
+        </label>
+        {error && <div className="error-box" role="alert">{error}</div>}
+      </section>
 
-      {error && <div className="error-box" role="alert">{error}</div>}
-      <button className="primary-btn" type="submit" disabled={!ballotLoaded || !electionOpen || submitting || candidates.length !== 3}>
-        {!ballotLoaded ? "Loading ballot…" : submitting ? "Securely recording…" : electionOpen ? <>Lodge my vote <Send size={15} /></> : "Voting is currently paused"}
-      </button>
+      <section className="evm-machine" aria-labelledby="ballot-unit-heading">
+        <span className="evm-screw screw-top-left" aria-hidden="true" />
+        <span className="evm-screw screw-top-right" aria-hidden="true" />
+        <span className="evm-screw screw-bottom-left" aria-hidden="true" />
+        <span className="evm-screw screw-bottom-right" aria-hidden="true" />
+
+        <header className="evm-machine-header">
+          <div>
+            <span>Eco Cultural Club</span>
+            <h2 id="ballot-unit-heading">BALLOT UNIT</h2>
+            <small>President election · Three candidates</small>
+          </div>
+          <div className="evm-ready-panel" aria-live="polite">
+            <span className={`evm-ready-light ${electionOpen ? "on" : ""}`} />
+            <strong>{!ballotLoaded ? "Loading" : electionOpen ? "Ready" : "Paused"}</strong>
+          </div>
+        </header>
+
+        <div className="evm-instruction-strip">
+          <span>Candidate</span>
+          <strong>Press the blue button to vote</strong>
+        </div>
+
+        <div className="evm-ballot-paper" role="radiogroup" aria-label="President candidates">
+          {candidates.map((candidate) => {
+            const active = submitting && candidateId === candidate.id;
+            return (
+              <div className={`evm-candidate-row ${active ? "active" : ""}`} key={candidate.id}>
+                <div className="evm-candidate-details">
+                  <span className="evm-serial-number">{candidate.ballot_number}</span>
+                  <span className="evm-candidate-photo" style={{ background: candidate.accent }}>
+                    {candidate.photo_url ? <Image src={candidate.photo_url} alt="" fill sizes="64px" unoptimized /> : candidate.ballot_number}
+                  </span>
+                  <span className="evm-candidate-copy">
+                    <strong>{candidate.name}</strong>
+                    <small>{candidate.tagline}</small>
+                  </span>
+                </div>
+                <div className="evm-control-column">
+                  <span className={`evm-candidate-light ${active ? "on" : ""}`} aria-hidden="true" />
+                  <button
+                    className="evm-blue-button"
+                    type="button"
+                    aria-label={`Vote for ${candidate.name}`}
+                    aria-pressed={active}
+                    disabled={!ballotLoaded || !electionOpen || submitting || candidates.length !== 3}
+                    onClick={() => void submitVote(candidate)}
+                  >
+                    <span aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+          {!ballotLoaded && <div className="evm-loading-row">Loading candidate ballot…</div>}
+        </div>
+
+        <div className={`evm-machine-message ${electionOpen ? "ready" : "paused"}`} aria-live="polite">
+          <span />
+          {!ballotLoaded ? "INITIALISING BALLOT" : submitting ? "RECORDING YOUR VOTE…" : electionOpen ? "READY — COMPLETE VERIFICATION, THEN PRESS ONE BLUE BUTTON" : "VOTING IS CURRENTLY PAUSED"}
+        </div>
+      </section>
     </form>
   );
 }
