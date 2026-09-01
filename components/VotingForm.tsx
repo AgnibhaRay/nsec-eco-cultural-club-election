@@ -12,7 +12,8 @@ type PublicCandidate = Candidate & { votes?: number };
 export default function VotingForm() {
   const router = useRouter();
   const [candidates, setCandidates] = useState<PublicCandidate[]>([]);
-  const [electionOpen, setElectionOpen] = useState(true);
+  const [ballotLoaded, setBallotLoaded] = useState(false);
+  const [electionOpen, setElectionOpen] = useState(false);
   const [resultsPublished, setResultsPublished] = useState(false);
   const [publishedAt, setPublishedAt] = useState<string | null>(null);
   const [totalVotes, setTotalVotes] = useState(0);
@@ -38,7 +39,8 @@ export default function VotingForm() {
         setPublishedAt(body.publishedAt);
         setTotalVotes(body.totalVotes ?? 0);
       })
-      .catch((err) => setError(err.message));
+      .catch((err) => setError(err.message))
+      .finally(() => setBallotLoaded(true));
 
     return () => streamRef.current?.getTracks().forEach((track) => track.stop());
   }, []);
@@ -51,6 +53,7 @@ export default function VotingForm() {
   }, [cameraState]);
 
   async function startCamera() {
+    if (!electionOpen) return;
     setError("");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -217,7 +220,7 @@ export default function VotingForm() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {cameraState === "captured" && photoPreview && <img src={photoPreview} alt="Captured voter selfie" />}
           <div className="camera-actions">
-            {cameraState === "idle" && <button className="mini-btn" type="button" onClick={startCamera}>Open camera</button>}
+            {cameraState === "idle" && <button className="mini-btn" type="button" onClick={startCamera} disabled={!electionOpen}>Open camera</button>}
             {cameraState === "live" && <button className="mini-btn" type="button" onClick={capturePhoto}>Take photo</button>}
             {cameraState === "captured" && <button className="mini-btn" type="button" onClick={retake}>Retake</button>}
           </div>
@@ -225,13 +228,13 @@ export default function VotingForm() {
       </div>
 
       <label className="consent">
-        <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
+        <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} disabled={!electionOpen} />
         <span>I understand this is a non-secret ballot: authorised election admins can see my name, photo, and selected candidate for verification.</span>
       </label>
 
       {error && <div className="error-box" role="alert">{error}</div>}
-      <button className="primary-btn" type="submit" disabled={!electionOpen || submitting || candidates.length !== 3}>
-        {submitting ? "Securely recording…" : electionOpen ? <>Lodge my vote <Send size={15} /></> : "Voting is currently paused"}
+      <button className="primary-btn" type="submit" disabled={!ballotLoaded || !electionOpen || submitting || candidates.length !== 3}>
+        {!ballotLoaded ? "Loading ballot…" : submitting ? "Securely recording…" : electionOpen ? <>Lodge my vote <Send size={15} /></> : "Voting is currently paused"}
       </button>
     </form>
   );
