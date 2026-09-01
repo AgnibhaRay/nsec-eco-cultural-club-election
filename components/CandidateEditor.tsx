@@ -51,12 +51,18 @@ function CandidateCard({
 
   return (
     <form className="candidate-edit-card" onSubmit={save}>
-      <div className="candidate-edit-photo">
-        {preview ? (
-          <Image src={preview} alt={`${name} profile`} fill sizes="120px" unoptimized />
-        ) : (
-          <span style={{ background: candidate.accent }}>{candidate.ballot_number}</span>
-        )}
+      <div className="candidate-card-topline">
+        <span>Ballot position</span><strong>{String(candidate.ballot_number).padStart(2, "0")}</strong>
+      </div>
+      <div className="candidate-faceplate">
+        <div className="candidate-edit-photo">
+          {preview ? (
+            <Image src={preview} alt={`${name} profile`} fill sizes="120px" unoptimized />
+          ) : (
+            <span style={{ background: candidate.accent }}>{candidate.ballot_number}</span>
+          )}
+        </div>
+        <div className="candidate-card-indicator"><span className={locked ? "locked" : ""} /><small>{locked ? "Locked" : "Editable"}</small></div>
       </div>
       <label className="photo-upload">
         <ImagePlus size={14} /> {preview ? "Replace photo" : "Add photo"}
@@ -106,11 +112,12 @@ export default function CandidateEditor({
   onSaved: () => Promise<void>;
 }) {
   return (
-    <section className="candidate-editor records-panel">
+    <section className="candidate-editor records-panel evm-candidate-editor">
       <div className="panel-title">
-        <div><span className="card-kicker">Ballot setup</span><h2>Candidate profiles</h2></div>
+        <div className="panel-heading-group"><span className="panel-icon"><ImagePlus size={18} /></span><div><span className="card-kicker">Ballot unit setup</span><h2>Candidate faceplates</h2></div></div>
         {locked && <span className="editor-lock-note">{lockReason}</span>}
       </div>
+      <p className="candidate-editor-note">Names and photographs appear on the public ballot in the numbered order shown below.</p>
       <div className="candidate-editor-grid">
         {candidates.map((candidate) => (
           <CandidateCard key={candidate.id} candidate={candidate} locked={locked} onSaved={onSaved} />

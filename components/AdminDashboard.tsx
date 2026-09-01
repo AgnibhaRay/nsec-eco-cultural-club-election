@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Award, Eye, Leaf, LogOut, Pause, Play, RefreshCw, ShieldCheck, Users } from "lucide-react";
+import { Award, Eye, Leaf, LogOut, Pause, Play, RefreshCw, Settings2, ShieldCheck, Users, Vote } from "lucide-react";
 import type { ResultsPayload } from "@/lib/types";
 import CandidateEditor from "@/components/CandidateEditor";
 
@@ -68,46 +68,62 @@ export default function AdminDashboard() {
   const leadingVotes = Math.max(1, ...(data?.candidates.map((candidate) => candidate.votes) ?? [1]));
 
   return (
-    <main className="admin-shell">
-      <header className="admin-header">
-        <div className="brand">
-          <span className="brand-mark"><Leaf size={19} /></span>
-          <span className="brand-copy"><strong>Election control room</strong><span>Eco Cultural Club · NSEC</span></span>
+    <main className="admin-shell evm-admin-shell">
+      <header className="admin-header evm-admin-header">
+        <div className="evm-admin-brand">
+          <span className="evm-club-mark"><Leaf size={21} /></span>
+          <span>
+            <strong>Eco Cultural Club</strong>
+            <small>Netaji Subhas Engineering College</small>
+          </span>
         </div>
+        <div className="evm-admin-header-label"><span>Authorised personnel only</span><strong>Election Control Unit</strong></div>
         <div className="admin-actions">
-          <button className="icon-btn" onClick={() => void load()} title="Refresh"><RefreshCw size={16} /></button>
+          <button className="icon-btn" onClick={() => void load()} title="Refresh election data" aria-label="Refresh election data"><RefreshCw size={16} /></button>
           <button className="secondary-btn" onClick={logout}><LogOut size={15} /> Sign out</button>
         </div>
       </header>
 
       <section className="admin-content">
-        <div className="admin-title-row">
+        <div className="admin-title-row evm-admin-title-row">
           <div>
-            <div className="eyebrow">Live administration</div>
-            <h1>Election overview</h1>
+            <div className="evm-kicker"><span /> Live administration</div>
+            <h1>Control <em>room.</em></h1>
+            <p className="evm-admin-intro">Monitor turnout, configure the ballot unit, and publish the certified final result.</p>
           </div>
-          {data && <div className="election-action-group">
-            {!data.resultsPublished && <button className={`state-button ${data.electionOpen ? "pause" : "resume"}`} disabled={busy} onClick={() => setElectionOpen(!data.electionOpen)}>
-              {data.electionOpen ? <><Pause size={16} /> Pause voting</> : <><Play size={16} /> Resume voting</>}
-            </button>}
-            {!data.resultsPublished ? (
-              <button className="state-button declare" disabled={busy} onClick={declareResult}><Award size={16} /> Declare final result</button>
-            ) : (
-              <span className="published-badge"><Award size={16} /> Result published</span>
-            )}
-          </div>}
+          {data && (
+            <div className="evm-master-control">
+              <span className="evm-screw screw-top-left" aria-hidden="true" />
+              <span className="evm-screw screw-top-right" aria-hidden="true" />
+              <div className="master-control-status">
+                <span className={`control-lamp ${data.resultsPublished ? "final" : data.electionOpen ? "on" : "paused"}`} />
+                <span><small>Public ballot</small><strong>{data.resultsPublished ? "Result final" : data.electionOpen ? "Voting open" : "Voting paused"}</strong></span>
+              </div>
+              <div className="election-action-group">
+                {!data.resultsPublished && <button className={`state-button ${data.electionOpen ? "pause" : "resume"}`} disabled={busy} onClick={() => setElectionOpen(!data.electionOpen)}>
+                  {data.electionOpen ? <><Pause size={16} /> Pause voting</> : <><Play size={16} /> Resume voting</>}
+                </button>}
+                {!data.resultsPublished ? (
+                  <button className="state-button declare" disabled={busy} onClick={declareResult}><Award size={16} /> Declare final result</button>
+                ) : (
+                  <span className="published-badge"><Award size={16} /> Result published</span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="integrity-banner">
+        <div className="integrity-banner evm-integrity-banner">
           <ShieldCheck size={21} />
-          <div><strong>Integrity controls active</strong><span>Emergency pause/resume actions are recorded in the audit log. Ballots cannot be edited from this dashboard.</span></div>
+          <div><strong>Integrity controls active</strong><span>Control actions are recorded in the audit log. Submitted ballots cannot be edited from this console.</span></div>
+          <span className="integrity-seal">SECURE</span>
         </div>
         {error && <div className="error-box admin-error">{error}</div>}
 
         {!data ? <div className="loading-panel">Loading secure election data…</div> : (
           <>
-            <div className="stats-grid">
-              <div className="stat-card total-card"><span className="stat-icon"><Users size={19} /></span><span>Total turnout</span><strong>{data.totalVotes}</strong></div>
+            <div className="stats-grid evm-stats-grid">
+              <div className="stat-card total-card"><span className="stat-icon"><Users size={19} /></span><span>Total turnout</span><strong>{String(data.totalVotes).padStart(3, "0")}</strong></div>
               {data.candidates.map((candidate) => (
                 <div className="stat-card" key={candidate.id}>
                   <span className="ballot-chip" style={{ background: candidate.accent }}>#{candidate.ballot_number}</span>
@@ -124,8 +140,12 @@ export default function AdminDashboard() {
               onSaved={load}
             />
 
-            <section className="records-panel">
-              <div className="panel-title"><div><span className="card-kicker">Private verification register</span><h2>Who voted for whom</h2></div><span className="status-pill"><span className={`status-dot ${data.electionOpen ? "" : "closed"}`} />{data.resultsPublished ? "Result final" : data.electionOpen ? "Voting open" : "Voting paused"}</span></div>
+            <section className="records-panel evm-register-panel">
+              <div className="panel-title">
+                <div className="panel-heading-group"><span className="panel-icon"><Vote size={18} /></span><div><span className="card-kicker">Private verification register</span><h2>Ballot audit register</h2></div></div>
+                <span className="status-pill"><span className={`status-dot ${data.electionOpen ? "" : "closed"}`} />{data.resultsPublished ? "Result final" : data.electionOpen ? "Voting open" : "Voting paused"}</span>
+              </div>
+              <div className="register-warning"><Eye size={14} /><span>Restricted view: voter choice and verification photographs are visible only to authorised administrators.</span></div>
               <div className="table-wrap">
                 <table>
                   <thead><tr><th>Voter</th><th>Choice</th><th>Submitted</th><th>Verification</th></tr></thead>
@@ -143,6 +163,7 @@ export default function AdminDashboard() {
                 </table>
               </div>
             </section>
+            <div className="evm-admin-footer"><Settings2 size={13} /><span>Election Control Unit · Eco Cultural Club, NSEC</span><strong>ADMIN CONSOLE</strong></div>
           </>
         )}
       </section>

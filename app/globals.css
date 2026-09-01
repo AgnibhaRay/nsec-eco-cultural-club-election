@@ -361,6 +361,171 @@ td small { color: var(--muted); font-size: 8px; margin-top: 3px; letter-spacing:
 .save-message { margin-left: 9px; font-size: 9px; font-weight: 800; color: var(--green); }
 .save-message.error { color: var(--danger); display: block; margin: 9px 0 0; line-height: 1.4; }
 
+/* Admin election control unit. */
+.evm-admin-shell {
+  color: #17201b;
+  background:
+    radial-gradient(circle at 8% 14%, rgba(240, 139, 45, .1), transparent 25%),
+    radial-gradient(circle at 91% 72%, rgba(22, 128, 75, .09), transparent 29%),
+    #efeee8;
+  position: relative;
+}
+.evm-admin-shell::after,
+.evm-login-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .2;
+  background-image: radial-gradient(#26362d 0.45px, transparent 0.45px);
+  background-size: 6px 6px;
+}
+.evm-admin-header {
+  height: 92px;
+  padding: 0 max(30px, calc((100vw - 1240px) / 2));
+  background: rgba(255, 255, 252, .92);
+  border-bottom-color: #c7c8c1;
+  box-shadow: 0 3px 18px rgba(33, 44, 38, .05);
+  position: relative;
+  z-index: 3;
+}
+.evm-admin-header::before,
+.evm-login-console::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, #f09033 0 33.33%, #f7f7f2 33.33% 66.66%, #18824d 66.66%);
+}
+.evm-admin-brand { display: flex; align-items: center; gap: 13px; }
+.evm-admin-brand strong,
+.evm-admin-brand small { display: block; }
+.evm-admin-brand strong { font: 700 16px var(--font-display); letter-spacing: -.02em; }
+.evm-admin-brand small { margin-top: 3px; color: #606b65; font-size: 9px; letter-spacing: .075em; text-transform: uppercase; }
+.evm-admin-header-label { margin-left: auto; margin-right: 24px; padding-left: 19px; border-left: 3px solid #e38b34; text-align: right; }
+.evm-admin-header-label span,
+.evm-admin-header-label strong { display: block; }
+.evm-admin-header-label span { color: #737c77; font-size: 8px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.evm-admin-header-label strong { margin-top: 3px; font: 700 14px var(--font-display); letter-spacing: .025em; text-transform: uppercase; }
+.evm-admin-header .icon-btn,
+.evm-admin-header .secondary-btn { border-radius: 5px; border-color: #aeb1ac; background: #f8f8f4; box-shadow: 0 2px 0 #b4b6b0; }
+.evm-admin-header .icon-btn:active,
+.evm-admin-header .secondary-btn:active { transform: translateY(2px); box-shadow: none; }
+
+.evm-admin-shell .admin-content { position: relative; z-index: 1; padding-top: 52px; }
+.evm-admin-title-row { align-items: center; }
+.evm-admin-title-row > div:first-child { min-width: 300px; }
+.evm-admin-title-row h1 { margin: 18px 0 0; font: 650 clamp(48px, 5.7vw, 74px)/.9 var(--font-display); letter-spacing: -.065em; }
+.evm-admin-title-row h1 em { color: #17633f; font-style: normal; }
+.evm-admin-title-row h1 em::after { display: none; }
+.evm-admin-intro { max-width: 490px; margin: 20px 0 0; color: #65706a; font-size: 12px; line-height: 1.7; }
+.evm-master-control {
+  width: min(570px, 100%);
+  padding: 23px 24px 20px;
+  border: 2px solid #747872;
+  border-radius: 11px;
+  background: linear-gradient(145deg, #ddddd7, #c3c4be);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), inset 0 -3px 7px rgba(32,36,34,.12), 0 14px 30px rgba(29,38,34,.13);
+  position: relative;
+}
+.master-control-status { display: flex; align-items: center; gap: 11px; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid #999c96; }
+.master-control-status span:last-child { min-width: 0; }
+.master-control-status small,
+.master-control-status strong { display: block; }
+.master-control-status small { color: #59605c; font-size: 8px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.master-control-status strong { margin-top: 3px; font-size: 12px; text-transform: uppercase; letter-spacing: .035em; }
+.control-lamp { width: 14px; height: 14px; flex: 0 0 auto; border-radius: 50%; background: #43d46d; border: 1px solid #17682f; box-shadow: 0 0 9px #2bd75f, inset 0 1px 1px rgba(255,255,255,.7); }
+.control-lamp.paused { background: #f14d3d; border-color: #88261d; box-shadow: 0 0 9px rgba(242,61,46,.85); }
+.control-lamp.final { background: #edaa2c; border-color: #7e5610; box-shadow: 0 0 9px rgba(237,170,44,.9); }
+.evm-master-control .election-action-group { justify-content: stretch; }
+.evm-master-control .state-button { flex: 1; justify-content: center; min-height: 44px; border-radius: 6px; border: 1px solid rgba(0,0,0,.28); box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 3px 0 rgba(48,51,48,.5); text-transform: uppercase; letter-spacing: .025em; }
+.evm-master-control .state-button:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
+.evm-master-control .state-button:focus-visible { outline: 3px solid #1c629d; outline-offset: 3px; }
+
+.evm-integrity-banner { min-height: 60px; margin-top: 36px; padding: 13px 17px; border-radius: 7px; border-color: #9eb594; border-left: 5px solid #177142; background: rgba(243,248,231,.9); }
+.evm-integrity-banner > svg { flex: 0 0 auto; }
+.evm-integrity-banner > div { flex: 1; }
+.integrity-seal { margin: 0 0 0 auto !important; padding: 7px 10px; border: 1px solid #79977d; border-radius: 4px; color: #315c40 !important; font: 900 8px var(--font-body); letter-spacing: .15em; }
+
+.evm-stats-grid { gap: 12px; margin-top: 20px; }
+.evm-stats-grid .stat-card {
+  min-height: 142px;
+  padding: 18px;
+  border: 2px solid #747872;
+  border-radius: 9px;
+  background: linear-gradient(145deg, #dcddd7, #c7c8c2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 8px 18px rgba(28,37,32,.09);
+}
+.evm-stats-grid .ballot-chip,
+.evm-stats-grid .stat-icon { border-radius: 4px; border: 1px solid rgba(0,0,0,.3); }
+.evm-stats-grid .stat-card strong { width: 100%; padding: 7px 10px; border: 1px solid #526257; border-radius: 4px; color: #18241d; background: #adc2ae; box-shadow: inset 0 2px 5px rgba(21,38,28,.2); font: 700 30px/1 var(--font-display); letter-spacing: .04em; }
+.evm-stats-grid .total-card strong { letter-spacing: .12em; }
+.evm-stats-grid .result-track { height: 5px; border-radius: 2px; background: #aaaca6; box-shadow: inset 0 1px 2px rgba(0,0,0,.18); }
+
+.evm-candidate-editor,
+.evm-register-panel { border: 2px solid #747872; border-radius: 11px; background: linear-gradient(145deg, #dbdbd5, #c5c6c0); box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 12px 26px rgba(28,37,32,.11); }
+.evm-candidate-editor { margin-top: 26px; }
+.evm-candidate-editor .panel-title,
+.evm-register-panel .panel-title { padding: 20px 22px; border-bottom-color: #969a94; }
+.panel-heading-group { display: flex; align-items: center; gap: 12px; }
+.panel-icon { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid #7d827d; border-radius: 5px; background: #b6b8b2; color: #173e2d; box-shadow: inset 0 1px 3px rgba(0,0,0,.12); }
+.evm-candidate-editor .card-kicker,
+.evm-register-panel .card-kicker { color: #505853; }
+.evm-candidate-editor .panel-title h2,
+.evm-register-panel .panel-title h2 { font-weight: 750; letter-spacing: -.025em; }
+.evm-candidate-editor .editor-lock-note { border: 1px solid #8e918c; border-radius: 4px; background: #b5b7b1; color: #303632; letter-spacing: .05em; text-transform: uppercase; }
+.candidate-editor-note { margin: 0; padding: 11px 22px; border-bottom: 1px solid #999c97; background: #303732; color: #eff2ee; font-size: 9px; letter-spacing: .025em; }
+.evm-candidate-editor .candidate-editor-grid { padding: 16px; gap: 12px; }
+.evm-candidate-editor .candidate-edit-card { padding: 0 14px 15px; border: 2px solid #272d29; border-radius: 5px; background: #f6f2e7; box-shadow: 2px 3px 0 rgba(64,68,65,.3); }
+.candidate-card-topline { height: 36px; margin: 0 -14px 14px; padding: 0 13px; display: flex; align-items: center; justify-content: space-between; color: #f2f4f1; background: #2a302c; }
+.candidate-card-topline span { font-size: 8px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.candidate-card-topline strong { font: 800 15px var(--font-display); }
+.candidate-faceplate { display: grid; grid-template-columns: minmax(0,1fr) 58px; border: 1px solid #4f5551; background: #d0d1cb; margin-bottom: 9px; }
+.evm-candidate-editor .candidate-edit-photo { height: 128px; margin: 0; border: 0; border-radius: 0; border-right: 1px solid #4f5551; background: #e2e2dc; }
+.candidate-card-indicator { display: grid; place-content: center; justify-items: center; gap: 7px; background: #b6b8b3; box-shadow: inset 3px 0 6px rgba(0,0,0,.08); }
+.candidate-card-indicator > span { width: 12px; height: 12px; border-radius: 50%; background: #37cc65; border: 1px solid #17652f; box-shadow: 0 0 7px rgba(40,206,92,.9), inset 0 1px 1px rgba(255,255,255,.8); }
+.candidate-card-indicator > span.locked { background: #ed9e29; border-color: #7f5612; box-shadow: 0 0 7px rgba(237,158,41,.85); }
+.candidate-card-indicator small { color: #424844; font-size: 7px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.evm-candidate-editor .photo-upload { margin: 0 0 15px; height: 34px; border-color: #90948f; border-radius: 4px; box-shadow: 0 2px 0 #a3a59f; text-transform: uppercase; letter-spacing: .035em; }
+.evm-candidate-editor .text-input { border-color: #92958f; border-radius: 4px; background: #fffef9; }
+.evm-candidate-editor .text-input:focus { border-color: #1c629d; box-shadow: 0 0 0 3px rgba(24,91,151,.1); }
+.evm-candidate-editor .save-candidate-btn { min-height: 38px; border: 1px solid #0b3b24; border-radius: 5px; box-shadow: 0 3px 0 #0a3823; text-transform: uppercase; letter-spacing: .025em; }
+.evm-candidate-editor .save-candidate-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
+
+.evm-register-panel { margin-top: 26px; background: #f6f3e9; }
+.evm-register-panel .panel-title { background: linear-gradient(145deg, #dbdbd5, #c5c6c0); }
+.evm-register-panel .status-pill { border-color: #818681; border-radius: 4px; background: #b4b6b0; text-transform: uppercase; letter-spacing: .04em; }
+.register-warning { padding: 10px 22px; display: flex; align-items: center; gap: 8px; color: #76511c; background: #fff2dc; border-bottom: 1px solid #c8ae83; font-size: 9px; font-weight: 700; }
+.evm-register-panel th { color: #e8ece9; background: #2d342f; }
+.evm-register-panel th,
+.evm-register-panel td { border-bottom-color: #d1cec3; }
+.evm-register-panel tbody tr:nth-child(even) { background: rgba(230,228,218,.5); }
+.evm-register-panel .choice-pill { border: 1px solid #aab4a8; border-radius: 4px; background: #e5ecdf; }
+.evm-register-panel .photo-link { color: #125b8e; }
+.evm-admin-footer { margin-top: 18px; display: flex; align-items: center; gap: 8px; color: #6e7671; font-size: 8px; letter-spacing: .06em; text-transform: uppercase; }
+.evm-admin-footer strong { margin-left: auto; color: #4c5550; }
+
+.evm-login-page {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(240,139,45,.18), transparent 30%),
+    radial-gradient(circle at 82% 78%, rgba(24,130,77,.2), transparent 32%),
+    #eae9e3;
+  position: relative;
+}
+.evm-login-console { position: relative; z-index: 1; width: min(500px, 100%); padding: 38px; border: 2px solid #747872; border-radius: 12px; background: linear-gradient(145deg, #deded8, #c5c6c0); box-shadow: inset 0 1px 0 rgba(255,255,255,.85), inset 0 -4px 8px rgba(32,36,34,.12), 0 28px 70px rgba(21,33,26,.25); }
+.evm-login-heading { display: grid; grid-template-columns: 48px 1fr auto; align-items: center; gap: 13px; padding-bottom: 18px; border-bottom: 1px solid #979a95; }
+.evm-login-heading .login-mark { margin: 0; }
+.evm-login-heading strong { display: block; margin-top: 3px; font: 800 16px var(--font-display); letter-spacing: .075em; }
+.login-ready-light { display: flex; align-items: center; gap: 6px; color: #415047; font-size: 8px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.login-ready-light i { width: 10px; height: 10px; border-radius: 50%; background: #37cf66; border: 1px solid #17652f; box-shadow: 0 0 7px rgba(40,206,92,.9); }
+.evm-login-console h1 { margin-top: 25px; font-size: 39px; }
+.evm-login-console p { color: #525e57; }
+.evm-login-console .text-input { border-color: #8e928d; border-radius: 5px; background: #fffefa; }
+.evm-login-console .text-input:focus { border-color: #1c629d; box-shadow: 0 0 0 3px rgba(24,91,151,.1); }
+.evm-login-console .primary-btn { min-height: 46px; border: 1px solid #0b3b24; border-radius: 6px; box-shadow: 0 3px 0 #0a3823; text-transform: uppercase; letter-spacing: .035em; }
+.evm-login-console .primary-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
+.evm-login-footer { display: block; margin-top: 23px; padding-top: 14px; border-top: 1px solid #9da09b; color: #5d6560; font-size: 8px; line-height: 1.5; text-align: center; text-transform: uppercase; letter-spacing: .07em; }
+
 .public-results-card h2 { margin-bottom: 7px; }
 .result-summary { margin: 0 0 22px; color: var(--muted); font-size: 10px; line-height: 1.6; }
 .public-result-list { display: grid; gap: 10px; }
@@ -380,6 +545,8 @@ td small { color: var(--muted); font-size: 8px; margin-top: 3px; letter-spacing:
 @media (max-width: 900px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .candidate-editor-grid { grid-template-columns: 1fr 1fr; }
+  .evm-admin-title-row { align-items: flex-start; flex-direction: column; }
+  .evm-master-control { width: 100%; }
 }
 @media (max-width: 1040px) {
   .evm-main-grid { grid-template-columns: 1fr; width: min(760px, calc(100% - 44px)); padding-top: 35px; }
@@ -399,6 +566,26 @@ td small { color: var(--muted); font-size: 8px; margin-top: 3px; letter-spacing:
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .candidate-editor-grid { grid-template-columns: 1fr; }
   .panel-title { align-items: flex-start; gap: 15px; flex-direction: column; }
+  .evm-admin-header { height: 78px; padding: 0 16px; }
+  .evm-admin-brand .evm-club-mark { width: 40px; height: 40px; }
+  .evm-admin-brand strong { font-size: 13px; }
+  .evm-admin-brand small, .evm-admin-header-label { display: none; }
+  .evm-admin-shell .admin-content { padding: 34px 12px 48px; }
+  .evm-admin-title-row { gap: 25px; }
+  .evm-admin-title-row h1 { font-size: 50px; }
+  .evm-admin-intro { font-size: 11px; }
+  .evm-master-control { padding: 21px 16px 18px; }
+  .evm-master-control .election-action-group { align-items: stretch; flex-direction: column; }
+  .evm-stats-grid .stat-card { min-height: 130px; padding: 14px; }
+  .evm-stats-grid .stat-card strong { font-size: 25px; }
+  .evm-candidate-editor .panel-title,
+  .evm-register-panel .panel-title { padding: 17px; }
+  .evm-candidate-editor .candidate-editor-grid { padding: 11px; }
+  .candidate-editor-note, .register-warning { padding-inline: 17px; }
+  .integrity-seal { display: none !important; }
+  .evm-login-console { padding: 30px 20px; }
+  .evm-login-heading { grid-template-columns: 44px 1fr; }
+  .login-ready-light { grid-column: 1 / -1; justify-content: flex-end; margin-top: -7px; }
 }
 
 @media (max-width: 650px) {
